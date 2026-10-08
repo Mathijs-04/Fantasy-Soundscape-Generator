@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ambience Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: system-ui, sans-serif; background: #15171c; color: #ddd; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+  h1 { font-weight: 500; }
+  section { margin: 1.5rem 0; }
+  label { display: block; margin-bottom: .4rem; font-size: .9rem; color: #9aa; }
+  .locs { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .locs button { padding: .5rem .9rem; background: #232731; color: #ddd; border: 1px solid #333; border-radius: 6px; cursor: pointer; }
+  .locs button.on { background: #3b5a8c; border-color: #6a8fd0; }
+  input[type=range] { width: 100%; }
+  .scale { display: flex; justify-content: space-between; font-size: .8rem; color: #789; }
+  #vibe { background: transparent; }
+  #vibeTrack { height: 6px; border-radius: 3px; margin-bottom: -4px; }
+  #play { padding: .7rem 2rem; font-size: 1rem; border-radius: 6px; border: 0; background: #4a8a5a; color: #fff; cursor: pointer; }
+  #play.playing { background: #8a4a4a; }
+  #reroll { margin-left: .5rem; padding: .7rem 1rem; border-radius: 6px; border: 1px solid #444; background: #232731; color: #ddd; cursor: pointer; }
+  pre { background: #0e1014; padding: .8rem; height: 200px; overflow: auto; font-size: .78rem; border-radius: 6px; }
+  #beds { font-size: .85rem; color: #9ab; }
+</style>
+</head>
+<body>
+<h1>Ambience Generator</h1>
+
+<section>
+  <label>Location</label>
+  <div class="locs" id="locs"></div>
+</section>
+
+<section>
+  <label>Vibe: <span id="vibeVal"></span></label>
+  <div id="vibeTrack"></div>
+  <input type="range" id="vibe" min="0" max="1" step="0.01" value="0.2">
+  <div class="scale"><span>Cozy</span><span>Eerie</span></div>
+  <div class="scale" id="vibeNote"></div>
+</section>
+
+<section>
+  <label>Effects: <span id="fxVal"></span></label>
+  <input type="range" id="fx" min="0" max="1" step="0.01" value="0.5">
+  <div class="scale"><span>None</span><span>Lots</span></div>
+</section>
+
+<section>
+  <button id="play">Play</button>
+  <button id="reroll">Reroll</button>
+</section>
+
+<section>
+  <div id="beds"></div>
+  <pre id="log"></pre>
+</section>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
