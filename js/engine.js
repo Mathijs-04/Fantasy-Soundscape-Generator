@@ -1,4 +1,4 @@
-import { LOOPS, ONESHOTS, LOCATIONS } from './catalog.js';
+import { LOOPS, ONESHOTS, LOCATIONS, BED_TIME } from './catalog.js';
 
 const rand = (a, b) => a + Math.random() * (b - a);
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -13,6 +13,7 @@ function pickWeighted(items, weightFn) {
   return items[items.length - 1];
 }
 
+const BED_TOLERANCE = 0.35; // a bed may differ at most this much from the danger level
 const FADE = 8;          // seconds, bed crossfades
 const DRIFT = [70, 150]; // seconds between spontaneous bed changes
 
@@ -119,13 +120,20 @@ export class Engine {
 
   // ----- beds -----
   _fit(id) { return gauss(LOOPS[id].e, this.params.vibe, 0.28); }
+  _bedOk(id) { return Math.abs(LOOPS[id].e - this.params.vibe) <= BED_TOLERANCE; }
 
   _pickBed(role, exclude = []) {
     const L = LOCATIONS[this.params.loc];
-    const pool = (role === 'base' ? L.base : L.layers).filter(id => !exclude.includes(id));
+    const all = (role === 'base' ? L.base : L.layers).filter(id => !exclude.includes(id));
+    // hard mood gate; layers are optional, so they are simply skipped when nothing fits
+    let pool = all.filter(id => this._bedOk(id));
+    if (!pool.length && role === 'base') {
+      // a base bed is mandatory: fall back to the closest match
+      const d = id => Math.abs(LOOPS[id].e - this.params.vibe);
+      pool = [...all].sort((a, b) => d(a) - d(b)).slice(0, 2);
+    }
     if (!pool.length) return null;
-    // floor keeps variety; gaussian keeps the mood consistent
-    return pickWeighted(pool, id => 0.04 + this._fit(id));
+    return pickWeighted(pool, id => 0.1 + this._fit(id));
   }
 
   async _startBed(id, role) {
@@ -162,7 +170,10 @@ export class Engine {
     else {
       for (const l of [...this.loops]) {
         const valid = (l.role === 'base' ? L.base : L.layers).includes(l.id);
-        if (!valid || this._fit(l.id) < 0.45) this._stopBed(l);
+        // a base bed is mandatory, so keep it when this location has no bed within tolerance at all
+        const noneFit = l.role === 'base' && !L.base.some(id => this._bedOk(id));
+        const keep = noneFit || this._bedOk(l.id);
+        if (!valid || !keep) this._stopBed(l);
       }
     }
     const jobs = [];
@@ -216,12 +227,25 @@ export class Engine {
 
   _pickOneShot() {
     const { loc, vibe } = this.params;
-    const pool = LOCATIONS[loc].sfx.filter(id => !this.recent.includes(id));
-    return pickWeighted(pool, id => ONESHOTS[id].w * (0.02 + gauss(ONESHOTS[id].e, vibe, 0.2)));
+    // time of day / weather of what is currently playing
+    const playing = this.loops.map(l => l.id);
+    const over = key => playing.some(id => BED_TIME[key].includes(id));
+    const allowed = LOCATIONS[loc].sfx.filter(id => {
+      const d = ONESHOTS[id];
+      if (vibe < d.min || vibe > d.max) return false;
+      if (d.day && (over('night') || over('storm'))) return false;
+      if (d.night && over('day')) return false;
+      return true;
+    });
+    const fresh = allowed.filter(id => !this.recent.includes(id));
+    const pool = fresh.length ? fresh : allowed;
+    if (!pool.length) return null;
+    return pickWeighted(pool, id => ONESHOTS[id].w * (0.05 + gauss(ONESHOTS[id].e, vibe, 0.25)));
   }
 
   async _playOneShot() {
     const id = this._pickOneShot();
+    if (!id) return;
     const def = ONESHOTS[id];
     this.recent.push(id); if (this.recent.length > 5) this.recent.shift();
     const buf = await this._load(def.file);

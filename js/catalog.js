@@ -85,6 +85,49 @@ export const ONESHOTS = {
   distantHowl:{ file: V + 'howling-in-the-distance-515982.mp3',     e: 0.65, w: 0.8, gain: 0.6 },
 };
 
+// ---------- Consistency rules ----------
+// Hard danger window [min, max] in which each one-shot may play at all. The gaussian weighting in the
+// engine only chooses *among* allowed sounds, so nothing out of mood can slip through by chance.
+// `day` / `night`: time-of-day sounds; they never play over a bed of the opposite time (see BED_TIME).
+const RULES = {
+  songbird: { min: 0,   max: 0.40, day: true },
+  birds:    { min: 0,   max: 0.40, day: true },
+  rooster:  { min: 0,   max: 0.30, day: true },
+  cows:     { min: 0,   max: 0.30, day: true },
+  cat:      { min: 0,   max: 0.40 },
+  dog:      { min: 0,   max: 0.45 },
+  shore:    { min: 0,   max: 0.50, day: true },
+  frog:     { min: 0,   max: 0.85, night: true },
+  magic:    { min: 0.05, max: 0.85 },
+  owl:      { min: 0.25, max: 1, night: true },
+  bat:      { min: 0.35, max: 1, night: true },
+  wolf:     { min: 0.35, max: 1, night: true },
+  distantHowl: { min: 0.40, max: 1, night: true },
+  whale:    { min: 0.25, max: 0.90 },
+  flies:    { min: 0.45, max: 1 },
+  creak:    { min: 0.45, max: 1 },
+  windGust: { min: 0.50, max: 1 },
+  hauntWind:{ min: 0.50, max: 1 },
+  footsteps:{ min: 0.50, max: 1 },
+  abyss:    { min: 0.60, max: 1 },
+  spider:   { min: 0.55, max: 1 },
+  growl:    { min: 0.60, max: 1 },
+  chains:   { min: 0.60, max: 1 },
+  wail:     { min: 0.65, max: 1 },
+  dragon:   { min: 0.80, max: 1 },
+  seaDragon:{ min: 0.80, max: 1 },
+};
+for (const [id, def] of Object.entries(ONESHOTS)) {
+  Object.assign(def, RULES[id] ?? RULES[id.replace(/\d+$/, '')] ?? { min: 0, max: 1 });
+}
+
+// Time of day / weather of the beds, used to keep one-shots plausible over them.
+export const BED_TIME = {
+  day:   ['forestDay', 'clearing', 'evening', 'lake', 'stream'],
+  night: ['forestNight', 'spooky', 'swamp', 'cavern', 'dungeon', 'embers'],
+  storm: ['thunder', 'rain', 'fog', 'winterWind', 'desertWind', 'peak'], // no birdsong in bad weather
+};
+
 // ---------- Locations ----------
 // vibe: [min, max] eeriness range the location supports (the UI slider is clamped to it).
 // loops: ids usable as beds. `base` = may be the main bed; others only as quieter layers.
@@ -96,12 +139,12 @@ export const LOCATIONS = {
     label: 'Forest', vibe: [0.0, 1.0],
     base: ['forestDay','clearing','evening','pine','autumn','rainforest','enchanted','forestNight','spooky'],
     layers: ['stream','rain','mist','fog','winterWind','thunder','waterfall'],
-    sfx: ['songbird','birds','owl','frog','wolf','distantHowl','bat','cows','rooster','spider','growl','footsteps','windGust','wail','dragon', ...MAGIC],
+    sfx: ['songbird','birds','owl','frog','wolf','distantHowl','bat','spider','growl','footsteps','windGust','wail','dragon', ...MAGIC],
   },
   ocean: {
     label: 'Ocean', vibe: [0.0, 1.0],
     base: ['lake','evening','ocean','mist','fog','thunder'],
-    layers: ['ocean','rain','winterWind','fog','mist','desertWind'],
+    layers: ['ocean','rain','winterWind','fog','mist'],
     sfx: ['shore','birds','whale','abyss','hauntWind','windGust','wail','seaDragon', ...MAGIC.slice(0,3)],
   },
   dungeon: {
@@ -113,8 +156,8 @@ export const LOCATIONS = {
   swamp: {
     label: 'Swamp', vibe: [0.3, 1.0],
     base: ['swamp','rainforest','forestNight','spooky'],
-    layers: ['fog','rain','mist','thunder','undergroundRiver'],
-    sfx: ['frog','owl','flies','bat','spider','growl','footsteps','windGust','wail','abyss', ...MAGIC.slice(0,3)],
+    layers: ['fog','rain','mist','thunder'],
+    sfx: ['frog','owl','flies','bat','spider','growl','footsteps','windGust','wail', ...MAGIC.slice(0,3)],
   },
   mountain: {
     label: 'Mountains', vibe: [0.1, 1.0],
@@ -126,6 +169,6 @@ export const LOCATIONS = {
     label: 'Campfire', vibe: [0.0, 0.8],
     base: ['campfire','bonfire','torch','embers'],
     layers: ['forestNight','evening','clearing','pine','rain','spooky','mist'],
-    sfx: ['owl','frog','cat','dog','cows','wolf','distantHowl','bat','footsteps','creak','growl', ...MAGIC.slice(0,3)],
+    sfx: ['owl','frog','cat','dog','cows','wolf','distantHowl','bat','footsteps','growl', ...MAGIC.slice(0,3)],
   },
 };
