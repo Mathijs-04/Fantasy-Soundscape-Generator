@@ -13,27 +13,27 @@ function pickWeighted(items, weightFn) {
   return items[items.length - 1];
 }
 
-const BED_TOLERANCE = 0.35; // a bed may differ at most this much from the danger level
-const FADE = 8;          // seconds, bed crossfades
-const DRIFT = [70, 150]; // seconds between spontaneous bed changes
+const BED_TOLERANCE = 0.35;
+const FADE = 8;
+const DRIFT = [70, 150];
 
 export class Engine {
   constructor(log = () => {}) {
     this.log = log;
     this.params = { loc: 'forest', vibe: 0.2, effects: 0.5 };
-    this.loops = [];        // active beds: {id, role, src, gain, level}
-    this.recent = [];       // recent one-shot ids (anti-repeat)
+    this.loops = [];
+    this.recent = [];
     this.buffers = new Map();
-    this.volume = 0.8;      // user output volume, 0..1
+    this.volume = 0.8;
     this.playing = false;
     this.onChange = () => {};
   }
 
-  // ----- setup -----
+
   _init() {
     if (this.ctx) return;
     const ctx = this.ctx = new AudioContext();
-    // master handles play/stop fades; output handles the user's volume slider
+
     this.output = ctx.createGain();
     this.output.gain.value = this.volume;
     this.output.connect(ctx.destination);
@@ -48,7 +48,7 @@ export class Engine {
     this.sfxBus = ctx.createGain();
     this.sfxBus.connect(this.master);
 
-    // Reverb for one-shots; wetter when eerie.
+
     this.reverb = ctx.createConvolver();
     this.reverb.buffer = this._impulse(3.2, 2.5);
     this.wet = ctx.createGain();
@@ -79,7 +79,7 @@ export class Engine {
     return this.buffers.get(file);
   }
 
-  // ----- public API -----
+
   async start() {
     this._init();
     await this.ctx.resume();
@@ -104,7 +104,7 @@ export class Engine {
     this.onChange();
   }
 
-  /** Update parameters. Location change = new scene; vibe/effects = gentle retune. */
+  
   set(params) {
     const locChanged = params.loc && params.loc !== this.params.loc;
     Object.assign(this.params, params);
@@ -113,34 +113,34 @@ export class Engine {
     if (!this.playing) return;
     this._applyMood();
     this.retune(locChanged);
-    this._scheduleSfx(); // effects density may have changed
+    this._scheduleSfx();
   }
 
   reroll() { if (this.playing) this.retune(true); }
 
-  /** Output volume, 0..1. Safe to call before start(). */
+  
   setVolume(v) {
     this.volume = clamp(v, 0, 1);
     if (this.output) this.output.gain.setTargetAtTime(this.volume, this.ctx.currentTime, 0.05);
   }
 
-  // ----- mood -----
+
   _applyMood() {
     const { vibe } = this.params;
     this.wet.gain.setTargetAtTime(0.15 + 0.7 * vibe, this.ctx.currentTime, 2);
   }
 
-  // ----- beds -----
+
   _fit(id) { return gauss(LOOPS[id].e, this.params.vibe, 0.28); }
   _bedOk(id) { return Math.abs(LOOPS[id].e - this.params.vibe) <= BED_TOLERANCE; }
 
   _pickBed(role, exclude = []) {
     const L = LOCATIONS[this.params.loc];
     const all = (role === 'base' ? L.base : L.layers).filter(id => !exclude.includes(id));
-    // hard mood gate; layers are optional, so they are simply skipped when nothing fits
+
     let pool = all.filter(id => this._bedOk(id));
     if (!pool.length && role === 'base') {
-      // a base bed is mandatory: fall back to the closest match
+
       const d = id => Math.abs(LOOPS[id].e - this.params.vibe);
       pool = [...all].sort((a, b) => d(a) - d(b)).slice(0, 2);
     }
@@ -156,7 +156,7 @@ export class Engine {
     const level = (role === 'base' ? rand(0.8, 1.0) : rand(0.25, 0.5)) * (def.gain ?? 1);
     const src = ctx.createBufferSource();
     src.buffer = buf; src.loop = true;
-    // some files fade in/out through silence: loop only the part in between
+
     const loopStart = def.loopStart ?? 0;
     const loopEnd = def.loopEnd ?? buf.duration;
     if (def.loopStart != null || def.loopEnd != null) { src.loopStart = loopStart; src.loopEnd = loopEnd; }
@@ -164,7 +164,7 @@ export class Engine {
     gain.gain.value = 0;
     gain.gain.setTargetAtTime(level, ctx.currentTime, FADE / 4);
     src.connect(gain); gain.connect(this.bedBus);
-    src.start(0, loopStart + Math.random() * (loopEnd - loopStart)); // random entry point -> never the same twice
+    src.start(0, loopStart + Math.random() * (loopEnd - loopStart));
     const rec = { id, role, src, gain, level };
     this.loops.push(rec);
     this.log(`bed + ${id} (${role}, e=${LOOPS[id].e})`);
@@ -180,14 +180,14 @@ export class Engine {
     this.onChange();
   }
 
-  /** Make the current beds match location + vibe, keeping what still fits. */
+  
   async retune(force = false) {
     const L = LOCATIONS[this.params.loc];
     if (force) [...this.loops].forEach(l => this._stopBed(l));
     else {
       for (const l of [...this.loops]) {
         const valid = (l.role === 'base' ? L.base : L.layers).includes(l.id);
-        // a base bed is mandatory, so keep it when this location has no bed within tolerance at all
+
         const noneFit = l.role === 'base' && !L.base.some(id => this._bedOk(id));
         const keep = noneFit || this._bedOk(l.id);
         if (!valid || !keep) this._stopBed(l);
@@ -211,7 +211,7 @@ export class Engine {
     await Promise.all(jobs);
   }
 
-  // The soundscape evolves forever: now and then one bed is swapped for another.
+
   _scheduleDrift() {
     clearTimeout(this.driftTimer);
     this.driftTimer = setTimeout(async () => {
@@ -227,13 +227,13 @@ export class Engine {
     }, rand(...DRIFT) * 1000);
   }
 
-  // ----- one-shots -----
+
   _scheduleSfx() {
     clearTimeout(this.sfxTimer);
     if (!this.playing) return;
     const fx = this.params.effects;
     if (fx < 0.03) return;
-    // mean gap: 70s at lowest, ~7s at max; exponential => natural, unpredictable spacing
+
     const mean = 70 * Math.pow(0.1, fx);
     const gap = Math.max(4, -Math.log(1 - Math.random()) * mean);
     this.sfxTimer = setTimeout(async () => {
@@ -244,14 +244,14 @@ export class Engine {
 
   _pickOneShot() {
     const { loc, vibe } = this.params;
-    // time of day / weather / depth of what is currently playing
+
     const playing = this.loops.map(l => l.id);
     const over = key => playing.some(id => BED_TIME[key].includes(id));
     const allowed = LOCATIONS[loc].sfx.filter(id => {
       const d = ONESHOTS[id];
       if (vibe < d.min || vibe > d.max) return false;
-      if (d.avoid.some(over)) return false;                 // e.g. no gulls over a deep-sea bed
-      if (d.needs && !d.needs.some(over)) return false;     // e.g. thunder needs bad weather
+      if (d.avoid.some(over)) return false;
+      if (d.needs && !d.needs.some(over)) return false;
       return true;
     });
     const fresh = allowed.filter(id => !this.recent.includes(id));
@@ -268,7 +268,7 @@ export class Engine {
     const buf = await this._load(def.file);
     if (!this.playing) return;
     const ctx = this.ctx, t = ctx.currentTime;
-    const dist = Math.random();                       // 0 near .. 1 far
+    const dist = Math.random();
     const src = ctx.createBufferSource();
     src.buffer = buf;
     if (!def.noPitch) src.playbackRate.value = rand(0.93, 1.07);
@@ -282,7 +282,7 @@ export class Engine {
     env.gain.setValueAtTime(peak, t + dur - fadeOut);
     env.gain.linearRampToValueAtTime(0, t + dur);
 
-    const lp = ctx.createBiquadFilter();               // distance = darker
+    const lp = ctx.createBiquadFilter();
     lp.type = 'lowpass'; lp.frequency.value = 18000 - 14500 * dist;
     const pan = ctx.createStereoPanner(); pan.pan.value = rand(-0.8, 0.8);
 

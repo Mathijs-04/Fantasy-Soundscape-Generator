@@ -1,19 +1,12 @@
-﻿// Sound catalog.
-// `e` = eeriness of the sound: 0 = very cozy, 1 = very eerie/horror. Tune freely after listening.
-// `w` = relative base probability (rare sounds get a low value).
-// `gain` = volume trim. Loops: multiplies the bed level (default 1). One-shots: base volume.
-// `loopStart` / `loopEnd` (loops only) = loop points in seconds, for files with silence at the start/end.
-// Durations are read from the decoded buffer.
-//
-// Folder layout:  Sound/loops/<forest|water|ocean|weather|fire|dungeon>/...
-//                 Sound/oneshots/<animals|birds|creatures|spooky|weather|water>/...
+﻿
+
 
 const L = 'Sound/loops/';
 const S = 'Sound/oneshots/';
 
-// ---------- Looping ambient beds (loop perfectly) ----------
+
 export const LOOPS = {
-  // forest
+
   forestDay:    { file: L + 'forest/day.mp3',         e: 0.08 },
   clearing:     { file: L + 'forest/clearing.mp3',    e: 0.12 },
   pine:         { file: L + 'forest/pine.mp3',        e: 0.25 },
@@ -23,21 +16,21 @@ export const LOOPS = {
   forestNight:  { file: L + 'forest/night.mp3',       e: 0.55 },
   spooky:       { file: L + 'forest/spooky.mp3',      e: 0.88 },
 
-  // water
+
   undergroundRiver: { file: L + 'water/underground-river.mp3', e: 0.55 },
   stream:       { file: L + 'water/stream.mp3',       e: 0.10 },
   lake:         { file: L + 'water/lake.mp3',         e: 0.08 },
   swamp:        { file: L + 'water/swamp.mp3',        e: 0.62 },
   waterfall:    { file: L + 'water/waterfall.mp3',    e: 0.20 },
 
-  // ocean
-  ocean:        { file: L + 'ocean/waves-1.mp3',      e: 0.35 },
-  ocean2:       { file: L + 'ocean/waves-2.wav',      e: 0.30, loopEnd: 11.6 }, // file ends in ~0.3 s of silence
-  ocean3:       { file: L + 'ocean/waves-3.wav',      e: 0.20 },                // steady, gentle wash
-  ocean4:       { file: L + 'ocean/waves-4.wav',      e: 0.40 },                // bigger, deeper swells
-  underwaterHum:{ file: L + 'ocean/underwater-hum.ogg', e: 0.75, gain: 0.17 },  // deep drone, recorded very loud
 
-  // weather
+  ocean:        { file: L + 'ocean/waves-1.mp3',      e: 0.35 },
+  ocean2:       { file: L + 'ocean/waves-2.wav',      e: 0.30, loopEnd: 11.6 },
+  ocean3:       { file: L + 'ocean/waves-3.wav',      e: 0.20 },
+  ocean4:       { file: L + 'ocean/waves-4.wav',      e: 0.40 },
+  underwaterHum:{ file: L + 'ocean/underwater-hum.ogg', e: 0.75, gain: 0.17 },
+
+
   desertWind:   { file: L + 'weather/desert-wind.mp3',    e: 0.45 },
   fog:          { file: L + 'weather/fog.mp3',            e: 0.65 },
   thunder:      { file: L + 'weather/thunderstorm.mp3',   e: 0.82 },
@@ -46,25 +39,24 @@ export const LOOPS = {
   peak:         { file: L + 'weather/mountain-peak.mp3',  e: 0.40 },
   evening:      { file: L + 'weather/summer-evening.mp3', e: 0.12 },
   winterWind:   { file: L + 'weather/winter-wind.mp3',    e: 0.60 },
-  // low, steady howl; recorded very loud. Fades through silence at both ends, so it loops 0.26 -> 8.34 s,
-  // where the waveform lines up (no click) and the volume matches within ~2 dB.
+
   strongWind:   { file: L + 'weather/strong-wind.wav',    e: 0.68, gain: 0.25, loopStart: 0.2596, loopEnd: 8.336 },
 
-  // fire
+
   campfire:     { file: L + 'fire/campfire.mp3',      e: 0.08 },
   bonfire:      { file: L + 'fire/bonfire.mp3',       e: 0.20 },
   torch:        { file: L + 'fire/torch.mp3',         e: 0.35 },
   embers:       { file: L + 'fire/embers.mp3',        e: 0.45 },
 
-  // dungeon
+
   cellarDrip:   { file: L + 'dungeon/cellar-drip.flac', e: 0.45 },
   dungeon:      { file: L + 'dungeon/dungeon.ogg',    e: 0.68 },
   cavern:       { file: L + 'dungeon/cavern.ogg',     e: 0.85 },
 };
 
-// ---------- One-shot effects ----------
+
 export const ONESHOTS = {
-  // animals
+
   bat:      { file: S + 'animals/bat-screech.mp3',       e: 0.55, w: 0.8, gain: 0.6 },
   cat:      { file: S + 'animals/cat-meow.mp3',          e: 0.10, w: 0.6, gain: 0.6 },
   dog:      { file: S + 'animals/dog-bark.mp3',          e: 0.15, w: 0.6, gain: 0.6 },
@@ -77,14 +69,14 @@ export const ONESHOTS = {
   flies:    { file: S + 'animals/flies-buzzing.mp3',     e: 0.70, w: 0.7, gain: 0.5 },
   whale:    { file: S + 'animals/whale-song.mp3',        e: 0.60, w: 0.8, gain: 0.6 },
 
-  // birds
+
   songbird: { file: S + 'birds/songbird.mp3',            e: 0.05, w: 1.2, gain: 0.6 },
   birds:    { file: S + 'birds/bird-chirps.mp3',         e: 0.05, w: 1.2, gain: 0.6 },
   killdeer: { file: S + 'birds/killdeer.flac',           e: 0.10, w: 0.8, gain: 0.45 },
-  woodpecker:{ file: S + 'birds/woodpecker.mp3',         e: 0.15, w: 0.8, gain: 2.35 }, // recorded quietly
+  woodpecker:{ file: S + 'birds/woodpecker.mp3',         e: 0.15, w: 0.8, gain: 2.35 },
   peacock:  { file: S + 'birds/peacock.ogg',             e: 0.20, w: 0.6, gain: 0.45 },
   quail:    { file: S + 'birds/quail.ogg',               e: 0.08, w: 0.8, gain: 0.55 },
-  // seagulls: 7 recordings at very different levels, gains evened out
+
   seagull1: { file: S + 'birds/seagull-1.wav',           e: 0.12, w: 0.25, gain: 0.45 },
   seagull2: { file: S + 'birds/seagull-2.wav',           e: 0.12, w: 0.25, gain: 1.55 },
   seagull3: { file: S + 'birds/seagull-3.wav',           e: 0.12, w: 0.25, gain: 1.35 },
@@ -93,25 +85,25 @@ export const ONESHOTS = {
   seagull6: { file: S + 'birds/seagull-6.wav',           e: 0.12, w: 0.25, gain: 0.95 },
   seagull7: { file: S + 'birds/seagull-7.wav',           e: 0.12, w: 0.25, gain: 1.85 },
 
-  // creatures (rare dragons: always eerie, no pitch variation)
+
   dragon:    { file: S + 'creatures/dragon-roar.mp3',     e: 0.95, w: 0.25, gain: 0.8, noPitch: true },
   seaDragon: { file: S + 'creatures/sea-dragon-roar.mp3', e: 0.95, w: 0.25, gain: 0.8, noPitch: true },
   growl:     { file: S + 'creatures/beast-growl.mp3',     e: 0.85, w: 0.6,  gain: 0.7 },
   spider:    { file: S + 'creatures/giant-spider.mp3',    e: 0.85, w: 0.6,  gain: 0.6 },
 
-  // spooky
+
   footsteps: { file: S + 'spooky/distant-footsteps.mp3',  e: 0.80, w: 0.8, gain: 0.6 },
   chains:    { file: S + 'spooky/chains-dragging.mp3',    e: 0.90, w: 0.7, gain: 0.6 },
   creak:     { file: S + 'spooky/floorboard-creak.mp3',   e: 0.72, w: 0.8, gain: 0.6 },
   wail:      { file: S + 'spooky/ghostly-wail.mp3',       e: 0.95, w: 0.7, gain: 0.6 },
   abyss:     { file: S + 'spooky/deep-sea-alien.mp3',     e: 0.90, w: 0.7, gain: 0.6 },
 
-  // weather
+
   windGust:  { file: S + 'weather/wind-gust.mp3',         e: 0.80, w: 0.8, gain: 0.5 },
   hauntWind: { file: S + 'weather/haunting-wind.mp3',     e: 0.80, w: 0.8, gain: 0.5 },
   distantThunder: { file: S + 'weather/distant-thunder.mp3', e: 0.55, w: 0.8, gain: 0.7 },
 
-  // water
+
   shore:     { file: S + 'water/shore-waves.mp3',         e: 0.15, w: 1.0, gain: 0.5 },
   wave1:     { file: S + 'water/wave-1.flac',             e: 0.20, w: 0.3, gain: 0.90 },
   wave2:     { file: S + 'water/wave-2.flac',             e: 0.20, w: 0.3, gain: 0.80 },
@@ -119,14 +111,7 @@ export const ONESHOTS = {
   wave4:     { file: S + 'water/wave-4.flac',             e: 0.25, w: 0.3, gain: 0.70 },
 };
 
-// ---------- Consistency rules ----------
-// Hard danger window [min, max] in which each one-shot may play at all. The gaussian weighting in the
-// engine only chooses *among* allowed sounds, so nothing out of mood can slip through by chance.
-// Context flags, checked against the beds that are currently playing (see BED_TIME):
-//   day:     time-of-day sound; never over a night bed or a storm/bad-weather bed
-//   night:   never over a daytime bed
-//   surface: only makes sense above the water line; never over a deep-sea bed
-//   stormy:  only plays while a storm/bad-weather bed is playing
+
 const RULES = {
   songbird: { min: 0,   max: 0.40, day: true },
   birds:    { min: 0,   max: 0.40, day: true, surface: true },
@@ -162,8 +147,7 @@ const RULES = {
   seaDragon:{ min: 0.80, max: 1 },
 };
 
-// Turn the flags into what the engine uses: `avoid` (BED_TIME groups that must NOT be playing)
-// and `needs` (at least one of these groups must be playing).
+
 for (const [id, def] of Object.entries(ONESHOTS)) {
   const rule = RULES[id] ?? RULES[id.replace(/\d+$/, '')] ?? { min: 0, max: 1 };
   const { day, night, surface, stormy, ...range } = rule;
@@ -174,18 +158,15 @@ for (const [id, def] of Object.entries(ONESHOTS)) {
   Object.assign(def, range, { avoid, needs: stormy ? ['storm'] : null });
 }
 
-// Time of day / weather / depth of the beds, used to keep one-shots plausible over them.
+
 export const BED_TIME = {
   day:   ['forestDay', 'clearing', 'evening', 'lake', 'stream'],
   night: ['forestNight', 'spooky', 'swamp', 'cavern', 'dungeon', 'cellarDrip', 'embers'],
-  storm: ['thunder', 'rain', 'fog', 'winterWind', 'desertWind', 'peak', 'strongWind'], // no birdsong in bad weather
-  deep:  ['underwaterHum'], // under the surface: no gulls, shore waves or other surface sounds
+  storm: ['thunder', 'rain', 'fog', 'winterWind', 'desertWind', 'peak', 'strongWind'],
+  deep:  ['underwaterHum'],
 };
 
-// ---------- Locations ----------
-// vibe: [min, max] eeriness range the location supports (the UI slider is clamped to it).
-// loops: ids usable as beds. `base` = may be the main bed; others only as quieter layers.
-// sfx: one-shot ids that make sense here.
+
 export const LOCATIONS = {
   forest: {
     label: 'Forest', vibe: [0.0, 1.0], ends: ['Peaceful Glade', 'Haunted Woods'],
