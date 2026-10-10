@@ -27,6 +27,8 @@
   .ends span { position: absolute; top: 0; white-space: nowrap; }
   #endLo { transform: none; }
   #endHi { transform: translateX(-100%); }
+  #vibeMsg { min-height: 18px; margin-top: 8px; font-size: 12px; color: var(--accent); opacity: 0; transition: opacity .3s; }
+  #vibeMsg.show { opacity: 1; }
   .hint { border-top: 1px solid var(--border); margin-top: 16px; padding-top: 12px; display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
   .hint #fxVal { color: var(--text); font-weight: 600; }
   .actions { display: flex; gap: 8px; align-items: center; }
@@ -57,6 +59,7 @@
   <input type="range" id="vibe" min="0" max="1" step="0.01" value="0.2">
   <div class="ends"><span id="endLo"></span><span id="endHi"></span></div>
   <div class="scale" id="vibeNote"></div>
+  <div id="vibeMsg"></div>
   <div class="hint"><span>Effects scale with danger</span><span id="fxVal"></span></div>
 </section>
 

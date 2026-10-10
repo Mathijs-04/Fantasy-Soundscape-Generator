@@ -52,12 +52,53 @@ function renderVibe() {
   $('fxVal').textContent = `Effects: ${Math.round(state.effects * 100)}%`;
 }
 
+// ----- option B: keep relative position on location change -----
+let tweenId = 0;
+
+// Animate the slider from `from` to `to`, clamping each frame to the current location's range.
+function tweenVibe(from, to, ms = 350) {
+  const id = ++tweenId;
+  const t0 = performance.now();
+  const step = now => {
+    if (id !== tweenId) return; // user grabbed the slider or started another tween
+    const k = Math.min(1, (now - t0) / ms);
+    const eased = 1 - (1 - k) ** 3;
+    state.vibe = from + (to - from) * eased;
+    clampVibe(); renderVibe(); push();
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+let msgTimer;
+function flash(text) {
+  const el = $('vibeMsg');
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(msgTimer);
+  msgTimer = setTimeout(() => el.classList.remove('show'), 4000);
+}
+
 let timer;
 function push() { clearTimeout(timer); timer = setTimeout(() => engine.set({ ...state }), 400); }
 
-$('vibe').oninput = e => { state.vibe = +e.target.value; clampVibe(); renderVibe(); push(); };
+$('vibe').oninput = e => {
+  tweenId++; // cancel any running animation
+  state.vibe = +e.target.value; clampVibe(); renderVibe(); push();
+};
+
 $('loc').oninput = e => {
-  state.loc = LOC_IDS[+e.target.value]; clampVibe(); renderLocs(); renderVibe(); push();
+  const [oldLo, oldHi] = LOCATIONS[state.loc].vibe;
+  const rel = (state.vibe - oldLo) / (oldHi - oldLo); // 0..1 position in the old range
+  const from = state.vibe;
+
+  state.loc = LOC_IDS[+e.target.value];
+  const [lo, hi] = LOCATIONS[state.loc].vibe;
+  const target = lo + Math.min(1, Math.max(0, rel)) * (hi - lo);
+
+  renderLocs();
+  tweenVibe(from, target);
+  flash(`${LOCATIONS[state.loc].label}: danger ${target.toFixed(2)} (${LOCATIONS[state.loc].ends.join(' to ')})`);
 };
 
 $('play').onclick = async () => {
