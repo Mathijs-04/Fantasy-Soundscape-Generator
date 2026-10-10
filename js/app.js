@@ -101,6 +101,8 @@ $('loc').oninput = e => {
   flash(`${LOCATIONS[state.loc].label}: danger ${target.toFixed(2)} (${LOCATIONS[state.loc].ends.join(' to ')})`);
 };
 
+$('volume').oninput = e => engine.setVolume(+e.target.value);
+
 $('play').onclick = async () => {
   if (engine.playing) { engine.stop(); }
   else { engine.params = { ...state }; await engine.start(); }

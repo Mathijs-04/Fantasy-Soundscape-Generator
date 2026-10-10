@@ -39,6 +39,7 @@
   #play.playing { background: var(--card); border-color: var(--danger); color: var(--danger); }
   #play.playing:hover { background: #fef2f2; }
   #beds { margin-left: auto; font-size: 12px; color: var(--muted); }
+  #volume { width: 120px; }
   .log-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 8px; }
   pre { margin: 0; background: var(--bg); border: 1px solid var(--border); padding: 12px; height: 200px; overflow: auto; font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; color: #344054; border-radius: 6px; }
 </style>
@@ -65,6 +66,7 @@
 
 <section class="actions">
   <button id="play">Play</button>
+  <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
   <div id="beds"></div>
 </section>
 

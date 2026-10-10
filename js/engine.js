@@ -24,6 +24,7 @@ export class Engine {
     this.loops = [];        // active beds: {id, role, src, gain, level}
     this.recent = [];       // recent one-shot ids (anti-repeat)
     this.buffers = new Map();
+    this.volume = 0.8;      // user output volume, 0..1
     this.playing = false;
     this.onChange = () => {};
   }
@@ -32,9 +33,14 @@ export class Engine {
   _init() {
     if (this.ctx) return;
     const ctx = this.ctx = new AudioContext();
+    // master handles play/stop fades; output handles the user's volume slider
+    this.output = ctx.createGain();
+    this.output.gain.value = this.volume;
+    this.output.connect(ctx.destination);
+
     this.master = ctx.createGain();
     this.master.gain.value = 0;
-    this.master.connect(ctx.destination);
+    this.master.connect(this.output);
 
     this.bedBus = ctx.createGain();
     this.bedBus.connect(this.master);
@@ -111,6 +117,12 @@ export class Engine {
   }
 
   reroll() { if (this.playing) this.retune(true); }
+
+  /** Output volume, 0..1. Safe to call before start(). */
+  setVolume(v) {
+    this.volume = clamp(v, 0, 1);
+    if (this.output) this.output.gain.setTargetAtTime(this.volume, this.ctx.currentTime, 0.05);
+  }
 
   // ----- mood -----
   _applyMood() {
