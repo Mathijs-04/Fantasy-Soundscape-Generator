@@ -224,12 +224,12 @@ function buildScene(root) {
       <path class="pines-far" d="${pinesFar}"/>
       <path class="pines" d="${pinesNear}"/>
     </g>
-    <g data-for="ocean">
-      <path class="sea-1" d="${seaWave(rnd, 600, 14, 70)}"/>
-      <path class="sea-2" d="${seaWave(rnd, 700, 18, 90)}"/>
-      <path class="sea-3" d="${seaWave(rnd, 800, 22, 110)}"/>
-    </g>
   </svg>
+  <div class="sea-layer" data-for="ocean">
+    <svg class="sea-svg s1" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><path class="sea-1" d="${seaWave(rnd, 600, 14, 70)}"/></svg>
+    <svg class="sea-svg s2" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><path class="sea-2" d="${seaWave(rnd, 700, 18, 90)}"/></svg>
+    <svg class="sea-svg s3" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><path class="sea-3" d="${seaWave(rnd, 800, 22, 110)}"/></svg>
+  </div>
   <div class="dungeon-layer">
     <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">${corridor({ stars, moonSvg, farPath, midPath, castleSvg, pinesFar, pinesNear })}</svg>
   </div>`;
