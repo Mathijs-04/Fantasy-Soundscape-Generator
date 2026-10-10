@@ -105,13 +105,15 @@ body[data-loc="camp"] .firelight { opacity: 1; animation: flicker 2.2s infinite 
 #scene g[data-for] { opacity: 0; }
 body[data-loc="forest"]   #scene g[data-for~="forest"],
 body[data-loc="swamp"]    #scene g[data-for~="swamp"],
-body[data-loc="dungeon"]  #scene g[data-for~="dungeon"],
 body[data-loc="camp"]     #scene g[data-for~="camp"],
 body[data-loc="mountain"] #scene g[data-for~="mountain"],
 body[data-loc="ocean"]    #scene g[data-for~="ocean"] { opacity: 1; }
 
-body[data-loc="dungeon"] #scene g[data-for]:not([data-for="dungeon"]) { transition: opacity 0s linear 1.4s; }
-body.exit-dungeon #scene g[data-for]:not([data-for="dungeon"]) { transition: none; }
+body[data-loc="dungeon"] #scene g[data-for] { transition: opacity 0s linear 1.4s; }
+body.exit-dungeon #scene g[data-for] { transition: none; }
+#scene .dungeon-layer { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; will-change: opacity; transform: translateZ(0); }
+body[data-loc="dungeon"] #scene .dungeon-layer { opacity: 1; }
+body:not([data-loc="ocean"]) #scene [class^="sea-"] { animation-play-state: paused; }
 body[data-loc="swamp"]    #scene g.pines-wrap { opacity: .85; }
 body[data-loc="mountain"] #scene g.pines-wrap { opacity: .6; }
 body[data-loc="ocean"]    #scene g.mtn-wrap   { opacity: .45; }
