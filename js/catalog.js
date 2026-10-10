@@ -1,96 +1,152 @@
 ﻿// Sound catalog.
 // `e` = eeriness of the sound: 0 = very cozy, 1 = very eerie/horror. Tune freely after listening.
 // `w` = relative base probability (rare sounds get a low value).
-// `dur` flag-free: durations are read from the decoded buffer.
+// `gain` = volume trim. Loops: multiplies the bed level (default 1). One-shots: base volume.
+// `loopStart` / `loopEnd` (loops only) = loop points in seconds, for files with silence at the start/end.
+// Durations are read from the decoded buffer.
+//
+// Folder layout:  Sound/loops/<forest|water|ocean|weather|fire|dungeon>/...
+//                 Sound/oneshots/<animals|birds|creatures|spooky|weather|water>/...
 
+const L = 'Sound/loops/';
+const S = 'Sound/oneshots/';
 
 // ---------- Looping ambient beds (loop perfectly) ----------
 export const LOOPS = {
-  forestDay:    { file: 'Sound/loops/forest/day.mp3',       e: 0.08 },
-  clearing:     { file: 'Sound/loops/forest/clearing.mp3',  e: 0.12 },
-  pine:         { file: 'Sound/loops/forest/pine.mp3',     e: 0.25 },
-  autumn:       { file: 'Sound/loops/forest/autumn.mp3',    e: 0.30 },
-  rainforest:   { file: 'Sound/loops/forest/rainforest.mp3',e: 0.30 },
-  enchanted:    { file: 'Sound/loops/forest/enchanted.mp3', e: 0.35 },
-  forestNight:  { file: 'Sound/loops/forest/night.mp3',     e: 0.55 },
-  spooky:       { file: 'Sound/loops/forest/spooky.mp3',    e: 0.88 },
+  // forest
+  forestDay:    { file: L + 'forest/day.mp3',         e: 0.08 },
+  clearing:     { file: L + 'forest/clearing.mp3',    e: 0.12 },
+  pine:         { file: L + 'forest/pine.mp3',        e: 0.25 },
+  autumn:       { file: L + 'forest/autumn.mp3',      e: 0.30 },
+  rainforest:   { file: L + 'forest/rainforest.mp3',  e: 0.30 },
+  enchanted:    { file: L + 'forest/enchanted.mp3',   e: 0.35 },
+  forestNight:  { file: L + 'forest/night.mp3',       e: 0.55 },
+  spooky:       { file: L + 'forest/spooky.mp3',      e: 0.88 },
 
-  undergroundRiver: { file: 'Sound/loops/water/underground-river.mp3', e: 0.55 },
-  stream:       { file: 'Sound/loops/water/stream.mp3',   e: 0.10 },
-  ocean:        { file: 'Sound/loops/ocean/waves-1.mp3',       e: 0.35 },
-  lake:         { file: 'Sound/loops/water/lake.mp3',    e: 0.08 },
-  swamp:        { file: 'Sound/loops/water/swamp.mp3',             e: 0.62 },
-  waterfall:    { file: 'Sound/loops/water/waterfall.mp3',         e: 0.20 },
+  // water
+  undergroundRiver: { file: L + 'water/underground-river.mp3', e: 0.55 },
+  stream:       { file: L + 'water/stream.mp3',       e: 0.10 },
+  lake:         { file: L + 'water/lake.mp3',         e: 0.08 },
+  swamp:        { file: L + 'water/swamp.mp3',        e: 0.62 },
+  waterfall:    { file: L + 'water/waterfall.mp3',    e: 0.20 },
 
-  desertWind:   { file: 'Sound/loops/weather/desert-wind.mp3',                 e: 0.45 },
-  fog:          { file: 'Sound/loops/weather/fog.mp3',                         e: 0.65 },
-  thunder:      { file: 'Sound/loops/weather/thunderstorm.mp3',          e: 0.82 },
-  rain:         { file: 'Sound/loops/weather/light-rain.mp3',                  e: 0.30 },
-  mist:         { file: 'Sound/loops/weather/morning-mist.mp3',                e: 0.30 },
-  peak:         { file: 'Sound/loops/weather/mountain-peak.mp3',               e: 0.40 },
-  evening:      { file: 'Sound/loops/weather/summer-evening.mp3',              e: 0.12 },
-  winterWind:   { file: 'Sound/loops/weather/winter-wind.mp3',                 e: 0.60 },
+  // ocean
+  ocean:        { file: L + 'ocean/waves-1.mp3',      e: 0.35 },
+  ocean2:       { file: L + 'ocean/waves-2.wav',      e: 0.30, loopEnd: 11.6 }, // file ends in ~0.3 s of silence
+  ocean3:       { file: L + 'ocean/waves-3.wav',      e: 0.20 },                // steady, gentle wash
+  ocean4:       { file: L + 'ocean/waves-4.wav',      e: 0.40 },                // bigger, deeper swells
+  underwaterHum:{ file: L + 'ocean/underwater-hum.ogg', e: 0.75, gain: 0.17 },  // deep drone, recorded very loud
 
-  campfire:     { file: 'Sound/loops/fire/campfire.mp3', e: 0.08 },
-  bonfire:      { file: 'Sound/loops/fire/bonfire.mp3',      e: 0.20 },
-  torch:        { file: 'Sound/loops/fire/torch.mp3',        e: 0.35 },
-  embers:       { file: 'Sound/loops/fire/embers.mp3',       e: 0.45 },
+  // weather
+  desertWind:   { file: L + 'weather/desert-wind.mp3',    e: 0.45 },
+  fog:          { file: L + 'weather/fog.mp3',            e: 0.65 },
+  thunder:      { file: L + 'weather/thunderstorm.mp3',   e: 0.82 },
+  rain:         { file: L + 'weather/light-rain.mp3',     e: 0.30 },
+  mist:         { file: L + 'weather/morning-mist.mp3',   e: 0.30 },
+  peak:         { file: L + 'weather/mountain-peak.mp3',  e: 0.40 },
+  evening:      { file: L + 'weather/summer-evening.mp3', e: 0.12 },
+  winterWind:   { file: L + 'weather/winter-wind.mp3',    e: 0.60 },
+  // low, steady howl; recorded very loud. Fades through silence at both ends, so it loops 0.26 -> 8.34 s,
+  // where the waveform lines up (no click) and the volume matches within ~2 dB.
+  strongWind:   { file: L + 'weather/strong-wind.wav',    e: 0.68, gain: 0.25, loopStart: 0.2596, loopEnd: 8.336 },
 
-  cavern:       { file: 'Sound/loops/dungeon/cavern.ogg',   e: 0.85 },
-  dungeon:      { file: 'Sound/loops/dungeon/dungeon.ogg',         e: 0.68 },
+  // fire
+  campfire:     { file: L + 'fire/campfire.mp3',      e: 0.08 },
+  bonfire:      { file: L + 'fire/bonfire.mp3',       e: 0.20 },
+  torch:        { file: L + 'fire/torch.mp3',         e: 0.35 },
+  embers:       { file: L + 'fire/embers.mp3',        e: 0.45 },
+
+  // dungeon
+  cellarDrip:   { file: L + 'dungeon/cellar-drip.flac', e: 0.45 },
+  dungeon:      { file: L + 'dungeon/dungeon.ogg',    e: 0.68 },
+  cavern:       { file: L + 'dungeon/cavern.ogg',     e: 0.85 },
 };
 
 // ---------- One-shot effects ----------
 export const ONESHOTS = {
   // animals
-  bat:      { file: 'Sound/oneshots/animals/bat-screech.mp3',    e: 0.55, w: 0.8, gain: 0.6 },
-  cat:      { file: 'Sound/oneshots/animals/cat-meow.mp3',   e: 0.10, w: 0.6, gain: 0.6 },
-  dog:      { file: 'Sound/oneshots/animals/dog-bark.mp3',   e: 0.15, w: 0.6, gain: 0.6 },
-  frog:     { file: 'Sound/oneshots/animals/frog-croak.mp3',     e: 0.30, w: 1.0, gain: 0.6 },
-  owl:      { file: 'Sound/oneshots/animals/owl-hoot.mp3',        e: 0.50, w: 1.0, gain: 0.6 },
-  rooster:  { file: 'Sound/oneshots/animals/rooster-crow.mp3',  e: 0.10, w: 0.5, gain: 0.6 },
-  songbird: { file: 'Sound/oneshots/birds/songbird.mp3', e: 0.05, w: 1.2, gain: 0.6 },
-  wolf:     { file: 'Sound/oneshots/animals/wolf-howl.mp3',        e: 0.60, w: 0.8, gain: 0.7 },
+  bat:      { file: S + 'animals/bat-screech.mp3',       e: 0.55, w: 0.8, gain: 0.6 },
+  cat:      { file: S + 'animals/cat-meow.mp3',          e: 0.10, w: 0.6, gain: 0.6 },
+  dog:      { file: S + 'animals/dog-bark.mp3',          e: 0.15, w: 0.6, gain: 0.6 },
+  frog:     { file: S + 'animals/frog-croak.mp3',        e: 0.30, w: 1.0, gain: 0.6 },
+  owl:      { file: S + 'animals/owl-hoot.mp3',          e: 0.50, w: 1.0, gain: 0.6 },
+  rooster:  { file: S + 'animals/rooster-crow.mp3',      e: 0.10, w: 0.5, gain: 0.6 },
+  wolf:     { file: S + 'animals/wolf-howl.mp3',         e: 0.60, w: 0.8, gain: 0.7 },
+  distantHowl: { file: S + 'animals/wolf-howl-distant.mp3', e: 0.65, w: 0.8, gain: 0.6 },
+  cows:     { file: S + 'animals/cows-mooing.mp3',       e: 0.05, w: 0.6, gain: 0.5 },
+  flies:    { file: S + 'animals/flies-buzzing.mp3',     e: 0.70, w: 0.7, gain: 0.5 },
+  whale:    { file: S + 'animals/whale-song.mp3',        e: 0.60, w: 0.8, gain: 0.6 },
 
-  // dragons (rare, always eerie, no pitch variation)
-  dragon:    { file: 'Sound/oneshots/creatures/dragon-roar.mp3',     e: 0.95, w: 0.25, gain: 0.8, noPitch: true },
-  seaDragon: { file: 'Sound/oneshots/creatures/sea-dragon-roar.mp3', e: 0.95, w: 0.25, gain: 0.8, noPitch: true },
+  // birds
+  songbird: { file: S + 'birds/songbird.mp3',            e: 0.05, w: 1.2, gain: 0.6 },
+  birds:    { file: S + 'birds/bird-chirps.mp3',         e: 0.05, w: 1.2, gain: 0.6 },
+  killdeer: { file: S + 'birds/killdeer.flac',           e: 0.10, w: 0.8, gain: 0.45 },
+  woodpecker:{ file: S + 'birds/woodpecker.mp3',         e: 0.15, w: 0.8, gain: 2.35 }, // recorded quietly
+  peacock:  { file: S + 'birds/peacock.ogg',             e: 0.20, w: 0.6, gain: 0.45 },
+  quail:    { file: S + 'birds/quail.ogg',               e: 0.08, w: 0.8, gain: 0.55 },
+  // seagulls: 7 recordings at very different levels, gains evened out
+  seagull1: { file: S + 'birds/seagull-1.wav',           e: 0.12, w: 0.25, gain: 0.45 },
+  seagull2: { file: S + 'birds/seagull-2.wav',           e: 0.12, w: 0.25, gain: 1.55 },
+  seagull3: { file: S + 'birds/seagull-3.wav',           e: 0.12, w: 0.25, gain: 1.35 },
+  seagull4: { file: S + 'birds/seagull-4.wav',           e: 0.12, w: 0.25, gain: 0.80 },
+  seagull5: { file: S + 'birds/seagull-5.wav',           e: 0.12, w: 0.25, gain: 0.80 },
+  seagull6: { file: S + 'birds/seagull-6.wav',           e: 0.12, w: 0.25, gain: 0.95 },
+  seagull7: { file: S + 'birds/seagull-7.wav',           e: 0.12, w: 0.25, gain: 1.85 },
 
-  // various sfx
-  birds:     { file: 'Sound/oneshots/birds/bird-chirps.mp3',           e: 0.05, w: 1.2, gain: 0.6 },
-  footsteps: { file: 'Sound/oneshots/spooky/distant-footsteps.mp3',     e: 0.80, w: 0.8, gain: 0.6 },
-  abyss:     { file: 'Sound/oneshots/spooky/deep-sea-alien.mp3',         e: 0.90, w: 0.7, gain: 0.6 },
-  flies:     { file: 'Sound/oneshots/animals/flies-buzzing.mp3',                e: 0.70, w: 0.7, gain: 0.5 },
-  creak:     { file: 'Sound/oneshots/spooky/floorboard-creak.mp3',          e: 0.72, w: 0.8, gain: 0.6 },
-  shore:     { file: 'Sound/oneshots/water/shore-waves.mp3',    e: 0.15, w: 1.0, gain: 0.5 },
-  wail:      { file: 'Sound/oneshots/spooky/ghostly-wail.mp3',                 e: 0.95, w: 0.7, gain: 0.6 },
-  spider:    { file: 'Sound/oneshots/creatures/giant-spider.mp3',         e: 0.85, w: 0.6, gain: 0.6 },
-  growl:     { file: 'Sound/oneshots/creatures/beast-growl.mp3',           e: 0.85, w: 0.6, gain: 0.7 },
-  windGust:  { file: 'Sound/oneshots/weather/wind-gust.mp3',   e: 0.80, w: 0.8, gain: 0.5 },
-  whale:     { file: 'Sound/oneshots/animals/whale-song.mp3',          e: 0.60, w: 0.8, gain: 0.6 },
-  hauntWind: { file: 'Sound/oneshots/weather/haunting-wind.mp3',          e: 0.80, w: 0.8, gain: 0.5 },
-  chains:    { file: 'Sound/oneshots/spooky/chains-dragging.mp3',        e: 0.90, w: 0.7, gain: 0.6 },
-  cows:      { file: 'Sound/oneshots/animals/cows-mooing.mp3',          e: 0.05, w: 0.6, gain: 0.5 },
-  distantHowl:{ file: 'Sound/oneshots/animals/wolf-howl-distant.mp3',     e: 0.65, w: 0.8, gain: 0.6 },
+  // creatures (rare dragons: always eerie, no pitch variation)
+  dragon:    { file: S + 'creatures/dragon-roar.mp3',     e: 0.95, w: 0.25, gain: 0.8, noPitch: true },
+  seaDragon: { file: S + 'creatures/sea-dragon-roar.mp3', e: 0.95, w: 0.25, gain: 0.8, noPitch: true },
+  growl:     { file: S + 'creatures/beast-growl.mp3',     e: 0.85, w: 0.6,  gain: 0.7 },
+  spider:    { file: S + 'creatures/giant-spider.mp3',    e: 0.85, w: 0.6,  gain: 0.6 },
+
+  // spooky
+  footsteps: { file: S + 'spooky/distant-footsteps.mp3',  e: 0.80, w: 0.8, gain: 0.6 },
+  chains:    { file: S + 'spooky/chains-dragging.mp3',    e: 0.90, w: 0.7, gain: 0.6 },
+  creak:     { file: S + 'spooky/floorboard-creak.mp3',   e: 0.72, w: 0.8, gain: 0.6 },
+  wail:      { file: S + 'spooky/ghostly-wail.mp3',       e: 0.95, w: 0.7, gain: 0.6 },
+  abyss:     { file: S + 'spooky/deep-sea-alien.mp3',     e: 0.90, w: 0.7, gain: 0.6 },
+
+  // weather
+  windGust:  { file: S + 'weather/wind-gust.mp3',         e: 0.80, w: 0.8, gain: 0.5 },
+  hauntWind: { file: S + 'weather/haunting-wind.mp3',     e: 0.80, w: 0.8, gain: 0.5 },
+  distantThunder: { file: S + 'weather/distant-thunder.mp3', e: 0.55, w: 0.8, gain: 0.7 },
+
+  // water
+  shore:     { file: S + 'water/shore-waves.mp3',         e: 0.15, w: 1.0, gain: 0.5 },
+  wave1:     { file: S + 'water/wave-1.flac',             e: 0.20, w: 0.3, gain: 0.90 },
+  wave2:     { file: S + 'water/wave-2.flac',             e: 0.20, w: 0.3, gain: 0.80 },
+  wave3:     { file: S + 'water/wave-3.flac',             e: 0.20, w: 0.3, gain: 0.85 },
+  wave4:     { file: S + 'water/wave-4.flac',             e: 0.25, w: 0.3, gain: 0.70 },
 };
 
 // ---------- Consistency rules ----------
 // Hard danger window [min, max] in which each one-shot may play at all. The gaussian weighting in the
 // engine only chooses *among* allowed sounds, so nothing out of mood can slip through by chance.
-// `day` / `night`: time-of-day sounds; they never play over a bed of the opposite time (see BED_TIME).
+// Context flags, checked against the beds that are currently playing (see BED_TIME):
+//   day:     time-of-day sound; never over a night bed or a storm/bad-weather bed
+//   night:   never over a daytime bed
+//   surface: only makes sense above the water line; never over a deep-sea bed
+//   stormy:  only plays while a storm/bad-weather bed is playing
 const RULES = {
   songbird: { min: 0,   max: 0.40, day: true },
-  birds:    { min: 0,   max: 0.40, day: true },
+  birds:    { min: 0,   max: 0.40, day: true, surface: true },
+  killdeer: { min: 0,   max: 0.40, day: true, surface: true },
+  quail:    { min: 0,   max: 0.40, day: true },
+  woodpecker:{ min: 0,  max: 0.45, day: true },
+  peacock:  { min: 0,   max: 0.50, day: true },
+  seagull:  { min: 0,   max: 0.50, day: true, surface: true },
   rooster:  { min: 0,   max: 0.30, day: true },
   cows:     { min: 0,   max: 0.30, day: true },
   cat:      { min: 0,   max: 0.40 },
   dog:      { min: 0,   max: 0.45 },
-  shore:    { min: 0,   max: 0.50, day: true },
+  shore:    { min: 0,   max: 0.50, day: true, surface: true },
+  wave:     { min: 0,   max: 0.80, surface: true },
   frog:     { min: 0,   max: 0.85, night: true },
   owl:      { min: 0.25, max: 1, night: true },
   bat:      { min: 0.35, max: 1, night: true },
   wolf:     { min: 0.35, max: 1, night: true },
   distantHowl: { min: 0.40, max: 1, night: true },
+  distantThunder: { min: 0.30, max: 1, stormy: true },
   whale:    { min: 0.25, max: 0.90 },
   flies:    { min: 0.45, max: 1 },
   creak:    { min: 0.45, max: 1 },
@@ -105,15 +161,25 @@ const RULES = {
   dragon:   { min: 0.80, max: 1 },
   seaDragon:{ min: 0.80, max: 1 },
 };
+
+// Turn the flags into what the engine uses: `avoid` (BED_TIME groups that must NOT be playing)
+// and `needs` (at least one of these groups must be playing).
 for (const [id, def] of Object.entries(ONESHOTS)) {
-  Object.assign(def, RULES[id] ?? RULES[id.replace(/\d+$/, '')] ?? { min: 0, max: 1 });
+  const rule = RULES[id] ?? RULES[id.replace(/\d+$/, '')] ?? { min: 0, max: 1 };
+  const { day, night, surface, stormy, ...range } = rule;
+  const avoid = [];
+  if (day) avoid.push('night', 'storm');
+  if (night) avoid.push('day');
+  if (surface) avoid.push('deep');
+  Object.assign(def, range, { avoid, needs: stormy ? ['storm'] : null });
 }
 
-// Time of day / weather of the beds, used to keep one-shots plausible over them.
+// Time of day / weather / depth of the beds, used to keep one-shots plausible over them.
 export const BED_TIME = {
   day:   ['forestDay', 'clearing', 'evening', 'lake', 'stream'],
-  night: ['forestNight', 'spooky', 'swamp', 'cavern', 'dungeon', 'embers'],
-  storm: ['thunder', 'rain', 'fog', 'winterWind', 'desertWind', 'peak'], // no birdsong in bad weather
+  night: ['forestNight', 'spooky', 'swamp', 'cavern', 'dungeon', 'cellarDrip', 'embers'],
+  storm: ['thunder', 'rain', 'fog', 'winterWind', 'desertWind', 'peak', 'strongWind'], // no birdsong in bad weather
+  deep:  ['underwaterHum'], // under the surface: no gulls, shore waves or other surface sounds
 };
 
 // ---------- Locations ----------
@@ -125,36 +191,37 @@ export const LOCATIONS = {
     label: 'Forest', vibe: [0.0, 1.0], ends: ['Peaceful Glade', 'Haunted Woods'],
     base: ['forestDay','clearing','evening','pine','autumn','rainforest','enchanted','forestNight','spooky'],
     layers: ['stream','rain','mist','fog','winterWind','thunder','waterfall'],
-    sfx: ['songbird','birds','owl','frog','wolf','distantHowl','bat','spider','growl','footsteps','windGust','wail','dragon'],
+    sfx: ['songbird','birds','woodpecker','quail','peacock','distantThunder','owl','frog','wolf','distantHowl','bat','spider','growl','footsteps','windGust','wail','dragon'],
   },
   ocean: {
     label: 'Ocean', vibe: [0.0, 1.0], ends: ['Safe Shallows', 'The Abyss'],
-    base: ['lake','evening','ocean','mist','fog','thunder'],
-    layers: ['ocean','rain','winterWind','fog','mist'],
-    sfx: ['shore','birds','whale','abyss','hauntWind','windGust','wail','seaDragon'],
+    base: ['lake','evening','ocean','ocean2','ocean3','ocean4','mist','fog','thunder','underwaterHum'],
+    layers: ['ocean','ocean2','ocean3','ocean4','rain','winterWind','strongWind','fog','mist'],
+    sfx: ['shore','birds','seagull1','seagull2','seagull3','seagull4','seagull5','seagull6','seagull7','killdeer',
+          'wave1','wave2','wave3','wave4','distantThunder','whale','abyss','hauntWind','windGust','wail','seaDragon'],
   },
   dungeon: {
     label: 'Dungeon', vibe: [0.45, 1.0], ends: ['Damp Cellar', 'Crypts of Doom'],
-    base: ['dungeon','cavern'],
-    layers: ['torch','embers','undergroundRiver','fog','winterWind','swamp'],
+    base: ['cellarDrip','dungeon','cavern'],
+    layers: ['cellarDrip','torch','embers','undergroundRiver','fog','winterWind','swamp'],
     sfx: ['bat','creak','footsteps','chains','spider','flies','growl','wail','hauntWind','dragon'],
   },
   swamp: {
     label: 'Swamp', vibe: [0.3, 1.0], ends: ['Wetlands', 'The Dreadfull Marshes'],
     base: ['swamp','rainforest','forestNight','spooky'],
     layers: ['fog','rain','mist','thunder'],
-    sfx: ['frog','owl','flies','bat','spider','growl','footsteps','windGust','wail'],
+    sfx: ['killdeer','distantThunder','frog','owl','flies','bat','spider','growl','footsteps','windGust','wail'],
   },
   mountain: {
     label: 'Mountains', vibe: [0.1, 1.0], ends: ['The High Pass', 'The Howling Peaks'],
-    base: ['evening','pine','peak','desertWind','winterWind'],
-    layers: ['stream','waterfall','fog','mist','thunder','rain'],
-    sfx: ['birds','songbird','wolf','distantHowl','owl','hauntWind','windGust','wail','growl','dragon'],
+    base: ['evening','pine','peak','desertWind','winterWind','strongWind'],
+    layers: ['stream','waterfall','fog','mist','thunder','rain','strongWind'],
+    sfx: ['birds','songbird','killdeer','quail','distantThunder','wolf','distantHowl','owl','hauntWind','windGust','wail','growl','dragon'],
   },
   camp: {
     label: 'Campfire', vibe: [0.0, 0.8], ends: ['Cozy Camp', 'Whispers in the Woods'],
     base: ['campfire','bonfire','torch','embers'],
-    layers: ['forestNight','evening','clearing','pine','rain','spooky','mist'],
-    sfx: ['owl','frog','cat','dog','cows','wolf','distantHowl','bat','footsteps','growl'],
+    layers: ['forestNight','evening','clearing','pine','rain','spooky','mist','strongWind'],
+    sfx: ['woodpecker','quail','peacock','rooster','distantThunder','owl','frog','cat','dog','cows','wolf','distantHowl','bat','footsteps','growl'],
   },
 };

@@ -152,14 +152,19 @@ export class Engine {
     const buf = await this._load(LOOPS[id].file);
     if (!this.playing) return null;
     const ctx = this.ctx;
-    const level = role === 'base' ? rand(0.8, 1.0) : rand(0.25, 0.5);
+    const def = LOOPS[id];
+    const level = (role === 'base' ? rand(0.8, 1.0) : rand(0.25, 0.5)) * (def.gain ?? 1);
     const src = ctx.createBufferSource();
     src.buffer = buf; src.loop = true;
+    // some files fade in/out through silence: loop only the part in between
+    const loopStart = def.loopStart ?? 0;
+    const loopEnd = def.loopEnd ?? buf.duration;
+    if (def.loopStart != null || def.loopEnd != null) { src.loopStart = loopStart; src.loopEnd = loopEnd; }
     const gain = ctx.createGain();
     gain.gain.value = 0;
     gain.gain.setTargetAtTime(level, ctx.currentTime, FADE / 4);
     src.connect(gain); gain.connect(this.bedBus);
-    src.start(0, Math.random() * buf.duration); // random entry point -> never the same twice
+    src.start(0, loopStart + Math.random() * (loopEnd - loopStart)); // random entry point -> never the same twice
     const rec = { id, role, src, gain, level };
     this.loops.push(rec);
     this.log(`bed + ${id} (${role}, e=${LOOPS[id].e})`);
@@ -239,14 +244,14 @@ export class Engine {
 
   _pickOneShot() {
     const { loc, vibe } = this.params;
-    // time of day / weather of what is currently playing
+    // time of day / weather / depth of what is currently playing
     const playing = this.loops.map(l => l.id);
     const over = key => playing.some(id => BED_TIME[key].includes(id));
     const allowed = LOCATIONS[loc].sfx.filter(id => {
       const d = ONESHOTS[id];
       if (vibe < d.min || vibe > d.max) return false;
-      if (d.day && (over('night') || over('storm'))) return false;
-      if (d.night && over('day')) return false;
+      if (d.avoid.some(over)) return false;                 // e.g. no gulls over a deep-sea bed
+      if (d.needs && !d.needs.some(over)) return false;     // e.g. thunder needs bad weather
       return true;
     });
     const fresh = allowed.filter(id => !this.recent.includes(id));
