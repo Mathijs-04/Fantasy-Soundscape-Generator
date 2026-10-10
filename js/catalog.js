@@ -124,37 +124,37 @@ export const BED_TIME = {
 // sfx: one-shot ids that make sense here.
 export const LOCATIONS = {
   forest: {
-    label: 'Forest', vibe: [0.0, 1.0],
+    label: 'Forest', vibe: [0.0, 1.0], ends: ['Peaceful Glade', 'Haunted Woods'],
     base: ['forestDay','clearing','evening','pine','autumn','rainforest','enchanted','forestNight','spooky'],
     layers: ['stream','rain','mist','fog','winterWind','thunder','waterfall'],
     sfx: ['songbird','birds','owl','frog','wolf','distantHowl','bat','spider','growl','footsteps','windGust','wail','dragon'],
   },
   ocean: {
-    label: 'Ocean', vibe: [0.0, 1.0],
+    label: 'Ocean', vibe: [0.0, 1.0], ends: ['Safe Shallows', 'The Abyss'],
     base: ['lake','evening','ocean','mist','fog','thunder'],
     layers: ['ocean','rain','winterWind','fog','mist'],
     sfx: ['shore','birds','whale','abyss','hauntWind','windGust','wail','seaDragon'],
   },
   dungeon: {
-    label: 'Dungeon', vibe: [0.45, 1.0],
+    label: 'Dungeon', vibe: [0.45, 1.0], ends: ['Damp Cellar', 'Crypts of Doom'],
     base: ['dungeon','cavern'],
     layers: ['torch','embers','undergroundRiver','fog','winterWind','swamp'],
     sfx: ['bat','creak','footsteps','chains','spider','flies','growl','wail','hauntWind','dragon'],
   },
   swamp: {
-    label: 'Swamp', vibe: [0.3, 1.0],
+    label: 'Swamp', vibe: [0.3, 1.0], ends: ['Wetlands', 'The Dreadfull Marshes'],
     base: ['swamp','rainforest','forestNight','spooky'],
     layers: ['fog','rain','mist','thunder'],
     sfx: ['frog','owl','flies','bat','spider','growl','footsteps','windGust','wail'],
   },
   mountain: {
-    label: 'Mountains', vibe: [0.1, 1.0],
+    label: 'Mountains', vibe: [0.1, 1.0], ends: ['The High Pass', 'The Howling Peaks'],
     base: ['evening','pine','peak','desertWind','winterWind'],
     layers: ['stream','waterfall','fog','mist','thunder','rain'],
     sfx: ['birds','songbird','wolf','distantHowl','owl','hauntWind','windGust','wail','growl','dragon'],
   },
   camp: {
-    label: 'Campfire', vibe: [0.0, 0.8],
+    label: 'Campfire', vibe: [0.0, 0.8], ends: ['Cozy Camp', 'Whispers in the Woods'],
     base: ['campfire','bonfire','torch','embers'],
     layers: ['forestNight','evening','clearing','pine','rain','spooky','mist'],
     sfx: ['owl','frog','cat','dog','cows','wolf','distantHowl','bat','footsteps','growl'],

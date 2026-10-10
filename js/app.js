@@ -34,15 +34,21 @@ function clampVibe() {
   $('vibe').value = state.vibe;
 }
 
-// Grey out the part of the slider that this location can't produce.
+// Grey out the part of the slider that this location can't produce,
+// and label each end with the location's own names.
 function renderVibe() {
-  const [lo, hi] = LOCATIONS[state.loc].vibe;
+  const L = LOCATIONS[state.loc];
+  const [lo, hi] = L.vibe;
   const p = x => (x * 100).toFixed(1) + '%';
   $('vibeTrack').style.background =
     `linear-gradient(to right, #e4e7ec ${p(lo)}, #60a5fa ${p(lo)}, #f87171 ${p(hi)}, #e4e7ec ${p(hi)})`;
   $('vibeVal').textContent = state.vibe.toFixed(2);
   $('vibeNote').textContent = (lo > 0 || hi < 1)
-    ? `${LOCATIONS[state.loc].label} supports ${lo.toFixed(2)} – ${hi.toFixed(2)}` : '';
+    ? `${L.label} supports ${lo.toFixed(2)} – ${hi.toFixed(2)}` : '';
+  $('endLo').textContent = L.ends[0];
+  $('endLo').style.left = p(lo);
+  $('endHi').textContent = L.ends[1];
+  $('endHi').style.left = p(hi);
   $('fxVal').textContent = `Effects: ${Math.round(state.effects * 100)}%`;
 }
 

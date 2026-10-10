@@ -23,6 +23,10 @@
   .scale { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 8px; }
   #vibeTrack { height: 4px; border-radius: 2px; margin-bottom: 4px; }
   #vibeNote:empty { display: none; }
+  .ends { position: relative; height: 20px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .ends span { position: absolute; top: 0; white-space: nowrap; }
+  #endLo { transform: none; }
+  #endHi { transform: translateX(-100%); }
   .hint { border-top: 1px solid var(--border); margin-top: 16px; padding-top: 12px; display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
   .hint #fxVal { color: var(--text); font-weight: 600; }
   .actions { display: flex; gap: 8px; align-items: center; }
@@ -51,9 +55,9 @@
   <div class="head"><label for="vibe">Danger level</label><span id="vibeVal"></span></div>
   <div id="vibeTrack"></div>
   <input type="range" id="vibe" min="0" max="1" step="0.01" value="0.2">
-  <div class="scale"><span>Safe</span><span>Lethal</span></div>
+  <div class="ends"><span id="endLo"></span><span id="endHi"></span></div>
   <div class="scale" id="vibeNote"></div>
-  <div class="hint"><span>Effects scale with danger: ~60% when Safe, 100% when Lethal</span><span id="fxVal"></span></div>
+  <div class="hint"><span>Effects scale with danger</span><span id="fxVal"></span></div>
 </section>
 
 <section class="actions">
